@@ -1,0 +1,115 @@
+-- Linguagem de Definição de Dados
+-- CREATE
+-- CRIAR UM BANCO DE DADOS
+CREATE DATABASE aula_ddl;
+
+-- SELECIONAR BANCO DE DADOS PARA UTILIZAÇÃO
+USE aula_ddl;
+
+-- CRIAR TABELA
+CREATE TABLE produto (
+prod_codigo INTEGER, 
+prod_descricao VARCHAR(50), 
+prod_valor DECIMAL(7,2),
+prod_quantidade INT(2));
+
+-- TRATAMENTO DE COLUNAS (NOT NULL, DEFAULT)
+CREATE TABLE cliente (
+clie_id INTEGER NOT NULL, 
+clie_nome VARCHAR(50) NOT NULL, 
+clie_dt_nasc DATE NOT NULL, 
+clie_situacao CHAR(7) DEFAULT 'INATIVO');
+
+-- CONSTRAINS 
+-- PRIMARY KEY (PK) - CHAVE PRIMÁRIA 
+-- SIMPLES
+CREATE TABLE funcionario (  
+func_id  INT NOT NULL AUTO_INCREMENT,
+func_nome  varchar(60) NOT NULL,  
+func_cpf char(15) NOT NULL,  
+func_tmp_servico int(11),
+PRIMARY KEY pk_funcionario (func_id));
+
+-- COMPOSTA
+CREATE TABLE venda (
+vend_codigo INT NOT NULL, 
+prod_codigo INT NOT NULL,
+clie_id INT NOT NULL,
+vend_data DATE NOT NULL, 
+vend_hora TIME NOT NULL,
+PRIMARY KEY pk_funcionario (vend_codigo,prod_codigo,clie_id));
+
+-- FOREIGN KEY (FK) - CHAVE ESTRANGEIRA
+-- ON DELETE (RESTRICT, CASCADE, SET NULL)
+CREATE TABLE cupom_fiscal (
+cufi_codigo INT NOT NULL,
+vend_codigo INT NOT NULL, 
+prod_codigo INT NOT NULL,
+clie_id INT NOT NULL,
+func_id INT NOT NULL,
+cufi_data DATE NOT NULL, 
+cufi_hora TIME NOT NULL,
+PRIMARY KEY pk_cupom_fiscal (cufi_codigo),
+FOREIGN KEY fk_cupom_fiscal_venda (vend_codigo,prod_codigo,clie_id)
+REFERENCES venda (vend_codigo,prod_codigo,clie_id),
+FOREIGN KEY fk_cupom_fiscal_funcionario (func_id)
+REFERENCES funcionario (func_id));
+
+-- UNIQUE KEY (UK) - CHAVE ÚNICA
+CREATE TABLE cargos (  
+carg_nome  varchar(60) NOT NULL,
+UNIQUE KEY uk_cargo_nome (carg_nome));
+
+-- CRIAR ÍNDICES 
+-- ASC - DESC
+CREATE INDEX ix_cliente_01 ON cliente (clie_nome);
+CREATE INDEX ix_funcionario_01 ON funcionario (func_nome DESC);
+
+-- ALTER
+-- ALTERAR CHARSET E COLLATION DO BANCO DE DADOS
+ALTER SCHEMA aula_ddl  DEFAULT CHARACTER SET latin1 
+DEFAULT COLLATE latin1_general_ci ;
+
+-- ALTER TABLE
+-- RENOMEAR TABELA
+ALTER TABLE cargos RENAME TO cargo;
+
+-- ADICIONAR UM NOVO CAMPO/ATRIBUTO NA TABELA 
+ALTER TABLE cargo ADD cargoident  DATE FIRST;
+ALTER TABLE cargo ADD carg_sigla CHAR (3);
+
+-- MODIFICAR CARACTERÍSTICAS DO TIPO DE DADOS DO CAMPO/ATRIBUTO DA TABELA 
+ALTER TABLE cargo MODIFY  cargoident  INT NOT NULL;
+
+-- RENOMEAR CAMPO/ATRIBUTO DA TABELA 
+ALTER TABLE cargo CHANGE  cargoident carg_id INT NOT NULL;
+
+-- REMOVER CAMPO/ATRIBUTO DA TABELA 
+ALTER TABLE cargo DROP carg_sigla;
+
+-- ADICIONAR PRIMARY KEY (PK) DE TABELA EXISTENTE
+ALTER TABLE cargo
+CHANGE COLUMN carg_id carg_id INT(11) NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (carg_id);
+
+ALTER TABLE produto
+CHANGE COLUMN prod_codigo prod_codigo INT(11) NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (prod_codigo);
+
+ALTER TABLE cliente
+CHANGE COLUMN clie_id clie_id INT(11) NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (clie_id);
+
+-- ADICIONAR FOREING KEY (PK) DE TABELA EXISTENTE
+ALTER TABLE funcionario ADD carg_id INT;
+ALTER TABLE funcionario ADD CONSTRAINT fk_funcionario_cargo
+FOREIGN KEY (carg_id)
+REFERENCES cargo (carg_id)
+ON DELETE SET NULL;
+
+-- DROP 
+-- REMOVER TABELA
+DROP TABLE cliente;
+
+-- REMOVER BANCO DE DADOS
+DROP DATABASE aula_ddl;
